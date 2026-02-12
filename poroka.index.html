@@ -68,7 +68,6 @@ function attend(value){
     document.getElementById('step1').classList.add('hidden');
     document.getElementById('step4').classList.remove('hidden');
     document.getElementById('finalMessage').innerText='Žal nama je, da vas ne bo.';
-    sendData({attendance: false});
   }
 }
 
@@ -80,13 +79,20 @@ function goToMenus(){
   container.innerHTML = '';
 
   adultNames.forEach((name, i)=>{
+    const div = document.createElement('div');
+    div.className = 'menu-select-wrapper';
+    
+    const label = document.createElement('label');
+    label.innerText = 'Meni za ' + name;
+    div.appendChild(label);
+
     const select = document.createElement('select');
     select.className='menu-select';
     select.id='adultMenu'+i;
 
     const optionDefault = document.createElement('option');
     optionDefault.value='';
-    optionDefault.innerText='Izberi meni za '+name;
+    optionDefault.innerText='Izberi meni';
     optionDefault.disabled = true;
     optionDefault.selected = true;
     select.appendChild(optionDefault);
@@ -98,7 +104,8 @@ function goToMenus(){
       select.appendChild(opt);
     });
 
-    container.appendChild(select);
+    div.appendChild(select);
+    container.appendChild(div);
   });
 
   document.getElementById('step2').classList.add('hidden');
@@ -115,21 +122,18 @@ function submitForm(){
 
   let children = parseInt(document.getElementById('children').value);
 
+  // pripravi vsebino e-maila
+  const subject = "RSVP Poroka Jana & Sašo";
+  const body = `Odrasli: ${adultNames.join(', ')}
+Otroci: ${children}
+Meni: ${menus.join(', ')}`;
+
+  // odpri predizpolnjen e-mail
+  window.location.href = `mailto:jana.zec@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
   document.getElementById('step3').classList.add('hidden');
   document.getElementById('step4').classList.remove('hidden');
-  document.getElementById('finalMessage').innerText='Veseliva se vaše udeležbe.';
-
-  sendData({
-    attendance: attendance,
-    adults: adultNames,
-    children: children,
-    menus: menus
-  });
-}
-
-function sendData(data){
-  // Tu lahko dodaš kodo za pošiljanje podatkov na Google Sheets ali server
-  console.log('Podatki poslani:', data);
+  document.getElementById('finalMessage').innerText='Veseliva se vaše udeležbe. Hvala za odgovor!';
 }
 </script>
 
