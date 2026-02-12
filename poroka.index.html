@@ -1,131 +1,211 @@
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kontakt</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSVP</title>
 
-  <!-- EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("rMouEV0MzdrboRa2w");
-    })();
-  </script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+(function(){
+  emailjs.init("rMouEV0MzdrboRa2w");
+})();
+</script>
 
-    .contact-container {
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
+<style>
+body {
+  margin: 0;
+  background: #f8f5f1;
+  font-family: 'Montserrat', sans-serif;
+  color: #4a4a4a;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+.container {
+  max-width: 600px;
+  margin: 80px auto;
+  background: white;
+  padding: 60px 40px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.07);
+  border-radius: 14px;
+}
 
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-    }
+h1 {
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
 
-    textarea {
-      resize: none;
-      height: 120px;
-    }
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  color: #8a8a8a;
+}
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #000;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+input, select {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
 
-    button:hover {
-      background: #333;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  background: #b89b72;
+  border: none;
+  color: white;
+  font-size: 14px;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .success-message {
-      display: none;
-      text-align: center;
-      color: green;
-      margin-top: 15px;
-    }
+button:hover {
+  background: #a8875f;
+}
 
-    .error-message {
-      display: none;
-      text-align: center;
-      color: red;
-      margin-top: 15px;
-    }
-  </style>
+.hidden {
+  display: none;
+}
+
+.note {
+  font-size: 13px;
+  color: #777;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.success, .error {
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+}
+
+.success { color: green; }
+.error { color: red; }
+</style>
 </head>
 
 <body>
 
-  <div class="contact-container">
-    <h2>Kontaktirajte nas</h2>
+<div class="container">
+  <h1>RSVP</h1>
+  <div class="subtitle">Veseliva se vaše potrditve</div>
 
-    <form id="contact-form">
-      <input type="text" name="user_name" placeholder="Vaše ime" required>
-      <input type="email" name="user_email" placeholder="Vaš email" required>
-      <textarea name="message" placeholder="Vaše sporočilo" required></textarea>
-      <button type="submit">Pošlji sporočilo</button>
-    </form>
+  <form id="rsvp-form">
 
-    <div class="success-message" id="success">
-      ✅ Sporočilo je bilo uspešno poslano!
+    <input type="text" id="adult_names" name="adult_names"
+      placeholder="Imena odraslih (ločena z vejico)" required>
+
+    <select id="attendance" name="attendance" required>
+      <option value="">Se boste udeležili?</option>
+      <option value="Da">Se udeležim</option>
+      <option value="Ne">Se ne udeležim</option>
+    </select>
+
+    <div id="children-section" class="hidden">
+      <input type="number" name="children_count" min="0"
+        placeholder="Število otrok">
+      <div class="note">Otroci prejmejo otroški meni.</div>
     </div>
 
-    <div class="error-message" id="error">
-      ❌ Prišlo je do napake. Poskusite znova.
-    </div>
-  </div>
+    <div id="menu-section" class="hidden"></div>
 
-  <script>
-    document.getElementById('contact-form')
-      .addEventListener('submit', function(event) {
-        event.preventDefault();
+    <button type="submit">Pošlji odgovor</button>
 
-        const successMsg = document.getElementById("success");
-        const errorMsg = document.getElementById("error");
+  </form>
 
-        successMsg.style.display = "none";
-        errorMsg.style.display = "none";
+  <div class="success" id="success">Hvala za vaš odgovor.</div>
+  <div class="error" id="error">Prišlo je do napake.</div>
 
-        emailjs.sendForm('default_service', 'template_6vrea4r', this)
-          .then(function() {
-            successMsg.style.display = "block";
-            document.getElementById("contact-form").reset();
-          }, function(error) {
-            errorMsg.style.display = "block";
-            console.log('FAILED...', error);
-          });
-      });
-  </script>
+</div>
+
+<script>
+const attendanceSelect = document.getElementById("attendance");
+const adultInput = document.getElementById("adult_names");
+const childrenSection = document.getElementById("children-section");
+const menuSection = document.getElementById("menu-section");
+
+attendanceSelect.addEventListener("change", function() {
+  if (this.value === "Da") {
+    childrenSection.classList.remove("hidden");
+    generateMenus();
+  } else {
+    childrenSection.classList.add("hidden");
+    menuSection.classList.add("hidden");
+    menuSection.innerHTML = "";
+  }
+});
+
+adultInput.addEventListener("input", function() {
+  if (attendanceSelect.value === "Da") {
+    generateMenus();
+  }
+});
+
+function generateMenus() {
+  const names = adultInput.value
+    .split(",")
+    .map(name => name.trim())
+    .filter(name => name !== "");
+
+  menuSection.innerHTML = "";
+
+  if (names.length > 0) {
+    menuSection.classList.remove("hidden");
+
+    names.forEach((name, index) => {
+      const select = document.createElement("select");
+      select.name = "menu_" + (index + 1);
+      select.required = true;
+
+      select.innerHTML = `
+        <option value="">Izbira menija za ${name}</option>
+        <option value="Mesni">Mesni meni</option>
+        <option value="Ribji">Ribji meni</option>
+        <option value="Vegi">Vegetarijanski meni</option>
+      `;
+
+      menuSection.appendChild(select);
+    });
+  } else {
+    menuSection.classList.add("hidden");
+  }
+}
+
+document.getElementById("rsvp-form")
+.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const success = document.getElementById("success");
+  const error = document.getElementById("error");
+
+  success.style.display = "none";
+  error.style.display = "none";
+
+  emailjs.sendForm('default_service', 'template_6vrea4r', this)
+    .then(function() {
+      success.style.display = "block";
+      document.getElementById("rsvp-form").reset();
+      childrenSection.classList.add("hidden");
+      menuSection.classList.add("hidden");
+      menuSection.innerHTML = "";
+    }, function(err) {
+      error.style.display = "block";
+      console.log(err);
+    });
+});
+</script>
 
 </body>
 </html>
