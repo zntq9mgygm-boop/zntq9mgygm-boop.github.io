@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSVP Poroka</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f6f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+h1, h2 { text-align: center; }
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    background: black;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+}
+.option {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+}
+.selected { border: 2px solid black; }
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+.hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="card">
+
+<div id="step1">
+<h1>Potrditev udeležbe</h1>
+<label>Ime in priimek</label>
+<input type="text" id="name">
+<button onclick="attend(true)">Se udeležim</button>
+<button onclick="attend(false)" style="background:#777;margin-top:10px">Ne pridem</button>
+</div>
+
+<div id="step2" class="hidden">
+<h2>Koliko oseb pride?</h2>
+<label>Odrasli</label>
+<input type="number" id="adults" min="1" value="1">
+<label>Otroci</label>
+<input type="number" id="children" min="0" value="0">
+<button onclick="goToMenus()">Nadaljuj</button>
+</div>
+
+<div id="step3" class="hidden">
+<h2>Izberi meni</h2>
+<p id="menuInfo"></p>
+<div id="menuOptions"></div>
+<button onclick="submitForm()">Potrdi</button>
+</div>
+
+<div id="step4" class="hidden">
+<h2>Hvala za odgovor ❤️</h2>
+<p id="finalMessage"></p>
+</div>
+
+</div>
+
+<script>
+let attendance = false;
+let selectedMenus = [];
+
+function attend(value){
+    attendance = value;
+    if(!document.getElementById('name').value){
+        alert('Vpišite ime');
+        return;
+    }
+    if(value){
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+    } else {
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step4').classList.remove('hidden');
+        document.getElementById('finalMessage').innerText='Žal nama je, da vas ne bo.';
+        sendData();
+    }
+}
+
+function goToMenus(){
+    let adults = parseInt(document.getElementById('adults').value);
+    if(adults < 1){
+        alert('Vsaj 1 odrasla oseba');
+        return;
+    }
+    document.getElementById('menuInfo').innerText='Izberite '+adults+' meni(jev)';
+    let container = document.getElementById('menuOptions');
+    container.innerHTML='';
+    ['Mesni','Ribji','Vegetarijanski'].forEach(menu=>{
+        let div = document.createElement('div');
+        div.className='option';
+        div.innerText = menu;
+        div.onclick = function(){ toggleMenu(div, menu, adults) };
+        container.appendChild(div);
+    });
+    document.getElementById('step2').classList.add('hidden');
+    document.getElementById('step3').classList.remove('hidden');
+}
+
+function toggleMenu(element, menu, limit){
+    if(selectedMenus.includes(menu)){
+        selectedMenus = selectedMenus.filter(m => m !== menu);
+        element.classList.remove('selected');
+    } else {
+        if(selectedMenus.length >= limit){
+            alert('Lahko izberete samo '+limit+' menijev');
+            return;
+        }
+        selectedMenus.push(menu);
+        element.classList.add('selected');
+    }
+}
+
+function submitForm(){
+    let adults = document.getElementById('adults').value;
+    if(selectedMenus.length != adults){
+        alert('Izberite ustrezno število menijev');
+        return;
+    }
+    document.getElementById('step3').classList.add('hidden');
+    document.getElementById('step4').classList.remove('hidden');
+    document.getElementById('finalMessage').innerText='Veseliva se vaše udeležbe.';
+    sendData();
+}
+
+function sendData(){
+    fetch("TUKAJ_PRILEPI_SVOJ_GOOGLE_SCRIPT_LINK", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            name: document.getElementById('name').value,
+            attendance: attendance,
+            adults: document.getElementById('adults')?.value || 0,
+            children: document.getElementById('children')?.value || 0,
+            menus: selectedMenus
+        })
+    });
+}
+</script>
+
+</body>
+</html>
